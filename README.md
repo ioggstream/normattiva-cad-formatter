@@ -1,20 +1,13 @@
-:warning: [removeme] Questo file è stato creato seguendo il  [README starter kit](https://github.com/italia/readme-starterkit) [removeme] :warning:
-
-[![License](https://img.shields.io/github/license/italia/bootstrap-italia.svg)](https://github.com/italia/bootstrap-italia/blob/master/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/italia/bootstrap-italia.svg)](https://github.com/italia/bootstrap-italia/issues)
+[![License](https://img.shields.io/github/license/ioggstream/normattiva-cad-formatter.svg)](https://github.com/ioggstream/normattiva-cad-formatter/blob/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/ioggstream/normattiva-cad-formatter.svg)](https://github.com/ioggstream/normattiva-cad-formatter/issues)
 [![Join the #design channel](https://img.shields.io/badge/Slack%20channel-%23design-blue.svg)](https://developersitalia.slack.com/messages/C7VPAUVB3/)
 [![Get invited](https://slack.developers.italia.it/badge.svg)](https://slack.developers.italia.it/)
 [![18app on forum.italia.it](https://img.shields.io/badge/Forum-18app-blue.svg)](https://forum.italia.it/c/18app-carta-docente)
 
-# Titolo
+# Normattiva CAD
 
-> Sottotitolo / Slogan / Descrizione breve
+> Formatta una norma italiana prendendola da normattiva
 
-*Read this in other languages: [English](README.EN.md).*
-
-## Immagini e GIF
-
-![Recordit GIF](http://g.recordit.co/iLN6A0vSD8.gif)
 
 # Indice
 
@@ -25,26 +18,24 @@
 
 # Come iniziare
 
+Questo progetto scarica una norma in formato XML da normattiva usando scrapy
+e la formatta in modo che sia gestibile da read-the-doc / docsitalia.
+
 ## Come installare
+
+Il prodotto usa tox
+
+```
+tox
+```
 
 ## Documentazione
 
-# Come contribuire
 
-## Community
-
-### Code of conduct
-
-### Responsible Disclosure
-
-### Segnalazione bug e richieste di aiuto
+Per Contribuire, Segnalazione bug e richieste di aiuto, usate github  https://github.com/ioggstream/normattiva-cad-formatter
 
 # Manutenzione 
 
 # Licenza 
 
-## Licenza generale 
-
-## Autori e Copyright
-
-## Licenze software dei componenti di terze parti
+BSD-3-Clause
