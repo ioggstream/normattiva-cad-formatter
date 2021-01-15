@@ -13,11 +13,13 @@ settings_discourse_url = "https://forum.italia.it/"
 
 # -- No need to change below here
 
-import sys, os
+import os
+import sys
+
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 docs_italia_theme = __import__("docs-italia-theme")
-from recommonmark.transform import AutoStructify
-from recommonmark.parser import CommonMarkParser
 
 # -- RTD configuration ------------------------------------------------
 

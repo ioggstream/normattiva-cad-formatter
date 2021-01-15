@@ -9,9 +9,6 @@ log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
 
 
-@pytest.fixture
-def cad():
-    return Path("cad.xml").read_text()
 
 
 INDEX_HEADER = """
@@ -51,19 +48,18 @@ def fix_accent(l):
 
 def parse_articolo(a):
     """
-<articolo id="19">
-<num>Art. 19.</num>
-<comma id="art19-com1">
-<num>1</num>
-<corpo>
-<h:p h:style="text-align: center;">Art. 20 </h:p>
-<h:p h:style="text-align: center;">Validita' ed efficacia probatoria dei documenti informatici </h:p>
-<h:br/>
-<h:p h:style="text-align: center;">((ARTICOLO ABROGATO DAL D.LGS. 26 AGOSTO 2016, N. 179)) </h:p>
-</corpo>
-</comma>
-</articolo>
-
+    <articolo id="19">
+        <num>Art. 19.</num>
+        <comma id="art19-com1">
+        <num>1</num>
+        <corpo>
+            <h:p h:style="text-align: center;">Art. 20 </h:p>
+            <h:p h:style="text-align: center;">Validita' ed efficacia probatoria dei documenti informatici </h:p>
+            <h:br/>
+            <h:p h:style="text-align: center;">((ARTICOLO ABROGATO DAL D.LGS. 26 AGOSTO 2016, N. 179)) </h:p>
+        </corpo>
+        </comma>
+    </articolo>
     """
     re_dashes = re.compile("^---+\s*$")  # ignore lines made of dashes
 
@@ -84,8 +80,6 @@ def parse_articolo(a):
     txt_intro = fix_accent("\n".join(intro + ["\n"])) if i else None
     txt_lines = fix_accent("\n".join(txt_lines))
     return txt_intro, txt_lines
-
-
 
 
 def mkfilename(capo_id, sezione_id=None, art_id=None):
@@ -147,9 +141,9 @@ class CAD(object):
         with idx.open("w") as fh:
             fh.write(INDEX_HEADER)
             for capo in self.capi:
-                fh.write(f"   dist/capo_{capo}.rst\n")
+                fh.write(f"   docs/dist/capo_{capo}.rst\n")
 
-        dpath = Path("dist")
+        dpath = Path("docs/dist")
         for capo_id, capo in self.capi.items():
             capo_fpath = dpath / f"capo_{capo_id}.rst"
             capo_titolo = fix_accent(capo["titolo"])
@@ -165,7 +159,7 @@ class CAD(object):
                 sezione_intro = sezione.get("intro", "")
                 if sezione_id:
                     sezione_fpath = dpath / mkfilename(capo_id, sezione_id)
-                    capo_txt += [f"   {str(sezione_fpath).replace('dist/','')}"]
+                    capo_txt += [f"   {str(sezione_fpath).replace('docs/dist/','')}"]
                     sezione_txt = [
                         sezione_titolo,
                         "-" * (len(sezione_titolo) + 2),
@@ -182,7 +176,7 @@ class CAD(object):
                     fpath = mkfilename(capo_id, sezione_id, art)
                     article_fpath = dpath / fpath
                     article_fpath.write_text(articolo)
-                    art_dest += [f"   {str(article_fpath).replace('dist/', '')}"]
+                    art_dest += [f"   {str(article_fpath).replace('docs/dist/', '')}"]
 
                 if sezione_txt:
                     sezione_fpath.write_text("\n".join(sezione_txt + ["", ""]))
@@ -201,6 +195,18 @@ def parse_capo(e):
         pass
 
     return sezione, fix_accent(text)
+
+
+if __name__ == '__main__':
+    cad = Path("cad.xml").read_text()
+    cadparser = CAD(text=cad)
+    cadparser.parse()
+    cadparser.dump_index()
+
+
+@pytest.fixture
+def cad():
+    return Path("cad.xml").read_text()
 
 
 def test_cad(cad):
