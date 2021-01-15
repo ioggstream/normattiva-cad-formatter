@@ -1,7 +1,9 @@
+import logging
+import re
 from pathlib import Path
+
 import pytest
 from scrapy import Selector
-import logging
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
@@ -30,7 +32,7 @@ def fix_accent(l):
     Es: liberta' -> libertà
     Po', po', è vengono ripristinati nella versione corretta
     """
-    l = l.replace("a'", "à").replace("e'", "é").replace("i'", "ì")
+    l = l.replace("a'", "à").replace("e'", "é").replace("i'", "ì").replace("A'", "À")
     l = l.replace("o'", "ò").replace("u'", "ù").replace("E'", "È")
     l = (
         l.replace("pò", "po'")
@@ -63,25 +65,27 @@ def parse_articolo(a):
 </articolo>
 
     """
+    re_dashes = re.compile("^---+\s*$")  # ignore lines made of dashes
+
     lines = a.xpath(".//corpo/p/text()")
     lines = [x.extract() for x in lines]
-    lines = [re.sub(r"^\(\(|\)\)$", "", l) for l in lines]
-    lines = [re.sub(r"^([a-z\-]+)\) ", r"\n  \1\) ", l) for l in lines]
-    lines = [re.sub(r"^([0-9a-z\-]+)\. ", r"\n  \1. ", l) for l in lines]
+    lines = [re_dashes.sub("\n", l) for l in lines]
+    lines = [re.sub(r"^\(\(|\)\)$", "", l.strip(" ")) for l in lines]
+    lines = [re.sub(r"^([0-9a-z\-]+)\) ", r"\n  \1\) ", l) for l in lines]
+    lines = [re.sub(r"^([0-9a-z\-]+)\. ", r"\n  \1\. ", l) for l in lines]
 
     for i, l in enumerate(lines):
         if l.startswith("Art"):
             break
     intro = lines[:i]
     art, headline, *body = lines[i:]
-    title = art + ". " + headline
+    title = art + ". " + headline.strip("().")
     txt_lines = [title, "^" * len(title), ""] + body + ["\n"]
     txt_intro = fix_accent("\n".join(intro + ["\n"])) if i else None
     txt_lines = fix_accent("\n".join(txt_lines))
     return txt_intro, txt_lines
 
 
-import re
 
 
 def mkfilename(capo_id, sezione_id=None, art_id=None):
@@ -174,7 +178,7 @@ class CAD(object):
                     sezione_txt = []
                     art_dest = capo_txt
                 for articolo in sezione["articoli"]:
-                    art = re.findall("Art.* ([0-9a-zA-Z\-]+)", articolo)[0]
+                    art = re.findall("Art[^ ]* ([0-9a-zA-Z\-]+)", articolo)[0]
                     fpath = mkfilename(capo_id, sezione_id, art)
                     article_fpath = dpath / fpath
                     article_fpath.write_text(articolo)
@@ -190,6 +194,12 @@ def parse_capo(e):
     sezione = e.xpath("@id").extract()[0]
     sezione = re.sub("[\r\n]", " ", sezione)
     text = re.sub("[\r\n]", " ", text)
+    try:
+        capo, testo = re.findall("(Capo [^ ]+) \(*([^)]+)\)*$", text, re.I)[0]
+        text = f"{capo}. {testo}"
+    except (IndexError, ValueError):
+        pass
+
     return sezione, fix_accent(text)
 
 
