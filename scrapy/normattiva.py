@@ -4,8 +4,8 @@ from pathlib import Path
 import scrapy
 from scrapy import FormRequest
 from scrapy.http import Request
-from scrapy.utils.response import open_in_browser
-
+import re
+import yaml
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -26,8 +26,17 @@ class BasicSpider(scrapy.Spider):
         self.dataPubblicazioneGazzetta = response.selector.xpath(
             '//input[@name="atto.dataPubblicazioneGazzetta"]'
         ).attrib["value"]
+        self.dataVigenza = re.findall(
+            "atto.dataVigenza=(\d+-\d+-\d+)", response.body.decode()
+        )[0]
+        self.titolo = (
+            response.selector.xpath('//meta[@property="eli:title"]/@content')
+            .get()
+            .strip()
+        )
         self.logger.info(
-            f"Trovate le seguenti informazioni: {self.codiceRedazionale}, {self.dataPubblicazioneGazzetta}"
+            f"Trovate le seguenti informazioni: {self.codiceRedazionale}, "
+            f"{self.dataPubblicazioneGazzetta}, {self.dataVigenza}"
         )
         url_1 = (
             f"https://www.normattiva.it/atto/vediMenuExport?"
@@ -38,7 +47,7 @@ class BasicSpider(scrapy.Spider):
 
     def parse_export(self, response):
         self.logger.info("Sending form from %s", response.url)
-        return scrapy.FormRequest.from_response(
+        return FormRequest.from_response(
             response,
             formid="anteprima",
             clickdata={"name": "generaXml"},
@@ -49,4 +58,16 @@ class BasicSpider(scrapy.Spider):
         self.logger.info(
             "Visited %s: %s", response.url, response.headers.get("Content-Type")
         )
-        Path("cad.xml").write_bytes(response.body)
+        Path("docs/_rst/cad.xml").write_bytes(response.body)
+        Path(f"docs/_rst/cad-{self.dataVigenza}.xml").write_bytes(response.body)
+        Path(f"docs/document_settings.yml").write_text(
+            yaml.safe_dump(
+                {
+                    "document": {
+                        "name": self.titolo,
+                        "description": "",
+                        "version": f"v{self.dataVigenza}",
+                    }
+                }
+            )
+        )

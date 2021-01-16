@@ -8,7 +8,7 @@ from scrapy import Selector
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
 
-
+BASEDIR = "docs/_rst"
 
 
 INDEX_HEADER = """
@@ -61,14 +61,36 @@ def parse_articolo(a):
         </comma>
     </articolo>
     """
-    re_dashes = re.compile("^---+\s*$")  # ignore lines made of dashes
+    re_dashes = re.compile("^---+\s*$")
+    re_comma = re.compile(r"^([0-9a-z\-]+)\)\s*")
+    re_punto = re.compile(r"^([0-9a-z\-]+)\.\s*")
 
     lines = a.xpath(".//corpo/p/text()")
     lines = [x.extract() for x in lines]
+
+    # Ignore lines made of dashes
     lines = [re_dashes.sub("\n", l) for l in lines]
+
+    # Removes parentheses from BOL / EOL
     lines = [re.sub(r"^\(\(|\)\)$", "", l.strip(" ")) for l in lines]
-    lines = [re.sub(r"^([0-9a-z\-]+)\) ", r"\n  \1\) ", l) for l in lines]
-    lines = [re.sub(r"^([0-9a-z\-]+)\. ", r"\n  \1\. ", l) for l in lines]
+
+    # Insert \n at the end of a numbered list.
+    j = 1
+    while j < len(lines):
+        l0, l1 = lines[j-1:j+1]
+        #if l1.startswith('(21)'): import pdb; pdb.set_trace()
+        l0_numbered = re_comma.match(l0) or re_punto.match(l0)
+        l1_numbered = re_comma.match(l1) or re_punto.match(l1)
+        if l0_numbered and not l1_numbered:
+            lines.insert(j, "\n")
+            j += 1
+        j += 1
+
+    # Lines matching 'something) .*' are commas or points,
+    #  so make them as numbered lists.
+    lines = [re_comma.sub(r"\n  \1\) ", l) for l in lines]
+    lines = [re_punto.sub(r"\n  \1\. ", l) for l in lines]
+
 
     for i, l in enumerate(lines):
         if l.startswith("Art"):
@@ -135,15 +157,16 @@ class CAD(object):
                     sezione_o["intro"] = intro_txt
             self.capi[capo]["sezioni"].append(sezione_o)
 
-    def dump_index(self):
-        idx = Path("index.rst")
+    def dump_index(self, outdir=BASEDIR):
+        dpath = Path(outdir)
+
+        idx = dpath / ".." / "index.rst"
 
         with idx.open("w") as fh:
             fh.write(INDEX_HEADER)
             for capo in self.capi:
-                fh.write(f"   docs/dist/capo_{capo}.rst\n")
+                fh.write(f"   _rst/capo_{capo}.rst\n")
 
-        dpath = Path("docs/dist")
         for capo_id, capo in self.capi.items():
             capo_fpath = dpath / f"capo_{capo_id}.rst"
             capo_titolo = fix_accent(capo["titolo"])
@@ -159,7 +182,7 @@ class CAD(object):
                 sezione_intro = sezione.get("intro", "")
                 if sezione_id:
                     sezione_fpath = dpath / mkfilename(capo_id, sezione_id)
-                    capo_txt += [f"   {str(sezione_fpath).replace('docs/dist/','')}"]
+                    capo_txt += [f"   {str(sezione_fpath).replace(f'{outdir}/','')}"]
                     sezione_txt = [
                         sezione_titolo,
                         "-" * (len(sezione_titolo) + 2),
@@ -176,7 +199,7 @@ class CAD(object):
                     fpath = mkfilename(capo_id, sezione_id, art)
                     article_fpath = dpath / fpath
                     article_fpath.write_text(articolo)
-                    art_dest += [f"   {str(article_fpath).replace('docs/dist/', '')}"]
+                    art_dest += [f"   {str(article_fpath).replace(f'{outdir}/', '')}"]
 
                 if sezione_txt:
                     sezione_fpath.write_text("\n".join(sezione_txt + ["", ""]))
@@ -198,7 +221,7 @@ def parse_capo(e):
 
 
 if __name__ == '__main__':
-    cad = Path("cad.xml").read_text()
+    cad = Path(f"{BASEDIR}/cad.xml").read_text()
     cadparser = CAD(text=cad)
     cadparser.parse()
     cadparser.dump_index()
