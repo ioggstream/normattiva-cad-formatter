@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 # -- PROJECT Variables ----------------------------------------------------
-settings_project_name = u"Linee Guida Modello di Interoperabilità"
-settings_copyright_copyleft = "Agenzia per l'Italia Digitale"
-settings_editor_name = "Agenzia per l'Italia Digitale"
-settings_doc_version = "Bozza in consultazione"
-settings_doc_release = "Bozza in consultazione"
-settings_basename = "lg-modellointeroperabilita-docs"
-settings_file_name = "lg-modellointeroperabilita-docs"
-settings_discourse_url = "https://forum.italia.it/"
+settings_project_name = "Codice della amministrazione digitale"
+settings_copyright_copyleft = "AgID - Team Digitale"
+settings_editor_name = "AgID - Team Digitale"
+settings_doc_version = "version: latest"
+settings_doc_release = "version: latest"
+settings_basename = "cad"
+settings_file_name = "cad"
 
 # -- No need to change below here
 
@@ -20,7 +19,6 @@ from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 docs_italia_theme = __import__("docs-italia-theme")
-
 # -- RTD configuration ------------------------------------------------
 
 # on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
@@ -54,9 +52,6 @@ extensions = [
     "sphinx.ext.ifconfig",
     "docs-italia-theme",
     "sphinx.ext.autosectionlabel",
-    "sphinxcontrib.discourse",
-    "sphinxcontrib.httpspec",
-    "sphinxcontrib.mermaid",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -81,7 +76,7 @@ project = settings_project_name
 copyright = settings_copyright_copyleft
 
 # URL of Discourse instance used by sphinxcontrib.discourse extension
-discourse_url = settings_discourse_url
+# discourse_url = settings_discourse_url
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -143,6 +138,7 @@ html_theme_options = {
     # This option can be used with docs-italia-theme to customise how the versions "badge" is shown:
     # 'False': default (alabaster) badge | 'True': custom (italia) badge
     "custom_versions_badge": "True",
+    "collapse_navigation": "True",
 }
 # -- ReadTheDoc requirements and local template generation---------------------
 
@@ -184,7 +180,7 @@ else:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -240,7 +236,7 @@ htmlhelp_basename = settings_basename + "doc"
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    "papersize": "a4paper",
+    #'papersize': 'a4paper',
     # The font size ('10pt', '11pt' or '12pt').
     #'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
@@ -262,17 +258,17 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = "media/agid-logo.png"
+# latex_logo = "images/..."
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
 # latex_use_parts = False
 
 # If true, show page references after internal links.
-latex_show_pagerefs = False
+# latex_show_pagerefs = False
 
 # If true, show URL addresses after external links.
-latex_show_urls = False
+# latex_show_urls = False
 
 # Documents to append as an appendix to all manuals.
 # latex_appendices = []

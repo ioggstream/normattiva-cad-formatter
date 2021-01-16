@@ -58,16 +58,20 @@ class BasicSpider(scrapy.Spider):
         self.logger.info(
             "Visited %s: %s", response.url, response.headers.get("Content-Type")
         )
-        Path("docs/_rst/cad.xml").write_bytes(response.body)
-        Path(f"docs/_rst/cad-{self.dataVigenza}.xml").write_bytes(response.body)
-        Path(f"docs/document_settings.yml").write_text(
-            yaml.safe_dump(
-                {
-                    "document": {
-                        "name": self.titolo,
-                        "description": "",
-                        "version": f"v{self.dataVigenza}",
-                    }
-                }
-            )
+        dpath = Path("docs/_rst")
+        dpath.mkdir(exist_ok=True)
+        Path(dpath / "cad.xml").write_bytes(response.body)
+        Path(dpath / f"cad-{self.dataVigenza}.xml").write_bytes(response.body)
+        document_settings_yaml = Path(f"docs/document_settings.yml")
+        document_settings = yaml.safe_load(
+            document_settings_yaml.read_text()
+        )
+        document_settings["document"].update(
+            {
+                "name": self.titolo,
+                "version": f"v{self.dataVigenza}",
+            }
+        )
+        document_settings_yaml.write_text(
+            yaml.safe_dump(document_settings)
         )
