@@ -15,7 +15,7 @@ class BasicSpider(scrapy.Spider):
     allowed_domains = ["www.normattiva.it"]
     start_urls = [
         "https://www.normattiva.it/uri-res/"
-        "N2Ls?urn:nir:stato:decreto.legislativo:2005-03-07;82"
+        "N2Ls?urn:nir:stato:decreto.legislativo:2005-03-07;82!vig=2021-01-16"
     ]
 
     def parse(self, response):
