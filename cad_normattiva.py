@@ -101,6 +101,16 @@ def parse_articolo(a):
     txt_lines = [title, "^" * len(title), ""] + body + ["\n"]
     txt_intro = fix_accent("\n".join(intro + ["\n"])) if i else None
     txt_lines = fix_accent("\n".join(txt_lines))
+
+    if not txt_intro:
+        txt_lines = txt_lines.splitlines()
+        title, body = '\n'.join(txt_lines[:2]), '\n'.join(txt_lines[2:])
+
+        # Add footnotes: this is a kludge to allow linking each "comma".
+        # body, count = re.subn('\. ([A-Z])', r'. [*]_ \1', body)
+        # body +=  '\n\n'  + '\n\n'.join(('.. [*] foo' for x in range(count))) + "\n\n"
+
+        txt_lines = title + '\n' + body
     return txt_intro, txt_lines
 
 
@@ -148,7 +158,7 @@ class CAD(object):
             sezione_o = {
                 sezione: fix_accent(sezione_titolo[0] if sezione_titolo else ""),
                 "articoli": [],
-                "intro": "foo",
+                "intro": "",
             }
             for a in s.xpath(".//articolo"):
                 intro_txt, articolo_txt = parse_articolo(a)
