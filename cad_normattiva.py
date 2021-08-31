@@ -71,8 +71,6 @@ def parse_articolo(a):
     # Ignore lines made of dashes
     lines = [re_dashes.sub("\n", l) for l in lines]
 
-    # Removes parentheses from BOL / EOL
-    lines = [re.sub(r"^\(\(|\)\)$", "", l.strip(" ")) for l in lines]
 
     # Insert \n at the end of a numbered list.
     j = 1
@@ -97,9 +95,10 @@ def parse_articolo(a):
             break
     intro = lines[:i]
     art, headline, *body = lines[i:]
-    title = art + ". " + headline.strip("().")
+    art = re.sub(r"\.$", "", art)
+    title = art + " " + headline
     txt_lines = [title, "^" * len(title), ""] + body + ["\n"]
-    txt_intro = fix_accent("\n".join(intro + ["\n"])) if i else None
+    txt_intro = fix_accent("\n\n".join(intro + ["\n"])) if i else None
     txt_lines = fix_accent("\n".join(txt_lines))
 
     if not txt_intro:
