@@ -71,10 +71,6 @@ def parse_articolo(a):
     # Ignore lines made of dashes
     lines = [re_dashes.sub("\n", l) for l in lines]
 
-    #log.debug(lines)
-    ## Removes parentheses
-    #lines = [re.sub(r"\(\((.+?)\)\)", r"\1", l.strip(" ")) for l in lines]
-    #log.debug(lines)
 
     # Insert \n at the end of a numbered list.
     j = 1
