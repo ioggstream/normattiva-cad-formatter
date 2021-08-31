@@ -95,8 +95,7 @@ def parse_articolo(a):
             break
     intro = lines[:i]
     art, headline, *body = lines[i:]
-    art=re.sub(r"\.$","",art)
-    #title = art + ". " + headline.strip("().")
+    art = re.sub(r"\.$", "", art)
     title = art + " " + headline
     txt_lines = [title, "^" * len(title), ""] + body + ["\n"]
     txt_intro = fix_accent("\n\n".join(intro + ["\n"])) if i else None
