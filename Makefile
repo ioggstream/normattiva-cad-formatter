@@ -1,6 +1,6 @@
 clean:
 	rm -fr docs/_*
-	rm -fr _* 
+	rm -fr _*
 
 build:
 	tox -e build

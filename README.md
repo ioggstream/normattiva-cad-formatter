@@ -34,8 +34,8 @@ tox
 
 Per Contribuire, Segnalazione bug e richieste di aiuto, usate github  https://github.com/ioggstream/normattiva-cad-formatter
 
-# Manutenzione 
+# Manutenzione
 
-# Licenza 
+# Licenza
 
 BSD-3-Clause

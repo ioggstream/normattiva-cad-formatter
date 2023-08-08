@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 import pytest
+
 from scrapy import Selector
 
 log = logging.getLogger()
@@ -77,8 +78,8 @@ def parse_articolo(a):
     # Insert \n at the end of a numbered list.
     j = 1
     while j < len(lines):
-        l0, l1 = lines[j-1:j+1]
-        #if l1.startswith('(21)'): import pdb; pdb.set_trace()
+        l0, l1 = lines[j - 1 : j + 1]
+        # if l1.startswith('(21)'): import pdb; pdb.set_trace()
         l0_numbered = re_comma.match(l0) or re_punto.match(l0)
         l1_numbered = re_comma.match(l1) or re_punto.match(l1)
         if l0_numbered and not l1_numbered:
@@ -90,7 +91,6 @@ def parse_articolo(a):
     #  so make them as numbered lists.
     lines = [re_comma.sub(r"\n  \1\) ", l) for l in lines]
     lines = [re_punto.sub(r"\n  \1\. ", l) for l in lines]
-
 
     for i, l in enumerate(lines):
         if l.startswith("Art"):
@@ -104,13 +104,13 @@ def parse_articolo(a):
 
     if not txt_intro:
         txt_lines = txt_lines.splitlines()
-        title, body = '\n'.join(txt_lines[:2]), '\n'.join(txt_lines[2:])
+        title, body = "\n".join(txt_lines[:2]), "\n".join(txt_lines[2:])
 
         # Add footnotes: this is a kludge to allow linking each "comma".
         # body, count = re.subn('\. ([A-Z])', r'. [*]_ \1', body)
         # body +=  '\n\n'  + '\n\n'.join(('.. [*] foo' for x in range(count))) + "\n\n"
 
-        txt_lines = title + '\n' + body
+        txt_lines = title + "\n" + body
     return txt_intro, txt_lines
 
 
@@ -230,7 +230,7 @@ def parse_capo(e):
     return sezione, fix_accent(text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cad = Path(f"{BASEDIR}/cad.xml").read_text()
     cadparser = CAD(text=cad)
     cadparser.parse()

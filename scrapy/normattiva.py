@@ -1,11 +1,12 @@
 import logging
+import re
 from pathlib import Path
+
+import yaml
 
 import scrapy
 from scrapy import FormRequest
 from scrapy.http import Request
-import re
-import yaml
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -64,15 +65,11 @@ class BasicSpider(scrapy.Spider):
         Path(dpath / "cad.xml").write_bytes(response.body)
         Path(dpath / f"cad-{self.dataVigenza}.xml").write_bytes(response.body)
         document_settings_yaml = Path(f"docs/document_settings.yml")
-        document_settings = yaml.safe_load(
-            document_settings_yaml.read_text()
-        )
+        document_settings = yaml.safe_load(document_settings_yaml.read_text())
         document_settings["document"].update(
             {
                 "name": self.titolo,
                 "version": f"v{self.dataVigenza}",
             }
         )
-        document_settings_yaml.write_text(
-            yaml.safe_dump(document_settings)
-        )
+        document_settings_yaml.write_text(yaml.safe_dump(document_settings))

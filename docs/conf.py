@@ -15,7 +15,6 @@ settings_file_name = "cad"
 import os
 import sys
 
-from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 docs_italia_theme = __import__("docs-italia-theme")
@@ -157,7 +156,10 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 else:
     # Override default css to get a larger width for ReadTheDoc build
     html_context = {
-        "css_files": ["_static/css/theme.css", "_static/css/badge_only.css",],
+        "css_files": [
+            "_static/css/theme.css",
+            "_static/css/badge_only.css",
+        ],
     }
 
 
